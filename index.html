@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>Task</title>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+  </body>
+  <h1 class="text-center my-5">Details of product </h1>
+  <div class="container d-flex justify-content-between my-5 align-items-center">
+    <h1>Filters:</h1>
+    <div class="d-block">
+      <select class="form-select" aria-label="Default select example">
+        <option value="" disabled="" selected="">Price</option>
+        <option onclick="getSortedData(0)">Ascending</option>
+        <option onclick="getSortedData(1)">Descending</option>  
+      </select>
+    </div>
+    <div class="d-block">
+      <select class="form-select" aria-label="Default select example" id="test" onclick="getFilterRangeData()">
+        <option value="" disabled="" selected="">Price Range</option>
+        <option value="1"> <1000</option>
+        <option value="2">1000-2000</option>
+        <option value="3">>2000</option>
+      </select>
+    </div>
+    <div class="d-block">
+      <select class="form-select" aria-label="Default select example" id="color" onclick="getFilterItemData('color')">
+        <option value="" disabled="" selected="">Color</option>
+        <option value="Gold">Gold</option>
+        <option value="White">White</option>
+        <option value="Red">Red</option>
+        <option value="Black">Black</option>
+        <option value="Multi-Color">Multi-Color</option>
+        <option value="Orange">Orange</option>
+        <option value="Peach">Peach</option>
+        <option value="Silver">Silver</option>
+        <option value="Green">Green</option>
+        <option value="Gold(FLASH PLATED)">Gold(FLASH PLATED)</option>
+        <option value="Black And White">Black And White</option>
+        <option value="Cyan">Cyan</option>
+        <option value="Blue">Blue</option>
+      </select>
+    </div>
+    <div class="d-block">
+      <select class="form-select" aria-label="Default select example" id="product_type" onclick="getFilterItemData('product_type')">
+        <option value="" disabled="" selected="">Category</option>
+        <option value="Personalized Jewelry">Personalized Jewelry</option>
+        <option value="Earrings">Earrings</option>
+        <option value="Rings">Rings</option>
+        <option value="Bracelets">Bracelets</option>
+        <option value="Necklaces">Necklaces</option>
+        <option value="Charms">Charms</option>
+        <option value="Body Jewelry">Body Jewelry</option>
+      </select>
+    </div>
+    <div class="d-block" onclick="datagetter()">
+      <a href="#" class="btn btn-primary">Get All Product</a>
+    </div>
+  </div>
+  
+  <div class="container">
+      
+      <div class="container">
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Product_id</th>
+                <th scope="col">SKU</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Color</th>
+                <th scope="col">product_type</th>
+                <th scope="col">product_image</th>
+              </tr>
+            </thead>
+            <tbody id="table-insertor">
+            </tbody>
+          </table>
+      </div>
+  </div>
+  <script>
+    /**
+ * Author - Bhaskar
+ *  Same code as script.js inorder to support ajax if it is not run on local server extension in vscode.
+ */
+
+/**Load All Data */
+let btn = document.getElementById("getdata");
+btn.addEventListener("click",datagetter);
+function datagetter(){
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET','http://localhost/task/api/read_data.php',true);
+    xhr.onprogress = function(){
+        console.log("In progress");
+    }
+    xhr.onload = function(){
+       if(this.status===200){
+           data = JSON.parse(this.response);
+           let table = document.getElementById("table-insertor");
+           ans = "";
+           for(let i = 0;i<data.length;i++){
+               ans+=`<tr>`;
+               ans+=`<td>${data[i]['product_id']}</td>`;
+               ans+=`<td>${data[i]['sku']}</td>`;
+               ans+=`<td>${data[i]['name']}</td>`;
+               ans+=`<td>${data[i]['price']}</td>`;
+               ans+=`<td>${data[i]['color']}</td>`;
+               ans+=`<td>${data[i]['product_type']}</td>`;
+               ans+=`<td>https:${data[i]['product_image']}"</td>`;
+               ans+='</tr>';
+           }
+           table.innerHTML=ans;
+       } 
+    }
+    xhr.send();
+}
+/**Function Calls Sort API and Gets result from their */
+function getSortedData(param){
+    order = ""
+    if(param===1)order="DESC";
+    else order = "ASC";
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST','http://localhost/task/api/sort_api.php',true);
+    xhr.getResponseHeader('Content-type','application/json');
+    xhr.onprogress = function(){
+        console.log("In progress");
+    }
+    xhr.onload = function(){
+        
+       console.log(this.response);
+       if(this.status===200){
+           data = JSON.parse(this.response);
+           let table = document.getElementById("table-insertor");
+           ans = "";
+           for(let i = 0;i<data.length;i++){
+               ans+=`<tr>`;
+               ans+=`<td>${data[i]['product_id']}</td>`;
+               ans+=`<td>${data[i]['sku']}</td>`;
+               ans+=`<td>${data[i]['name']}</td>`;
+               ans+=`<td>${data[i]['price']}</td>`;
+               ans+=`<td>${data[i]['color']}</td>`;
+               ans+=`<td>${data[i]['product_type']}</td>`;
+               ans+=`<td>https:${data[i]['product_image']}"</td>`;
+               ans+='</tr>';
+           }
+           table.innerHTML=ans;
+       } 
+       else{
+           console.log("some error occured!");
+       }
+    }
+    xhr.send(JSON.stringify({"order":order}));
+}
+/**Utility Function That enables us to load data into a table present in the front UI */
+function fill_table(getParam,url){
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST',url,true);
+    xhr.getResponseHeader('Content-type','application/json');
+    xhr.onload = function(){ 
+       console.log(this.response);
+       if(this.status===200){
+           data = JSON.parse(this.response);
+           let table = document.getElementById("table-insertor");
+           ans = "";
+           for(let i = 0;i<data.length;i++){
+               ans+=`<tr>`;
+               ans+=`<td>${data[i]['product_id']}</td>`;
+               ans+=`<td>${data[i]['sku']}</td>`;
+               ans+=`<td>${data[i]['name']}</td>`;
+               ans+=`<td>${data[i]['price']}</td>`;
+               ans+=`<td>${data[i]['color']}</td>`;
+               ans+=`<td>${data[i]['product_type']}</td>`;
+               ans+=`<td>https:${data[i]['product_image']}"</td>`;
+               ans+='</tr>';
+           }
+           table.innerHTML=ans;
+       } 
+       else{
+           console.log("some error occured!");
+       }
+    }
+    xhr.send(JSON.stringify(getParam));
+}
+/**Function Helps us to get data in range by calling Filter Range API */
+function getFilterRangeData(){
+
+    var ele = document.getElementById("test");
+    var val= parseInt(ele.value);
+    console.log(val);
+    var lo = (val-1)*1000;
+    var hi = val*1000;
+    fill_table({"lo":lo,"hi":hi},'http://localhost/task/api/filter_range.php');
+} 
+/**Function given below call filter-item api and get the result for category, color and product_name */
+function getJson(paramName,paramType){
+    return {"param-type": paramName,"param-value":paramType};
+}
+function getFilterItemData(ftype){
+
+    var ele = document.getElementById(ftype);
+    var val = ele.value;
+    fill_table(getJson(ftype,val),"http://localhost/task/api/filter_item.php");
+}
+
+
+    </script>
+  <script src="/js/script.js">
+  </script>
+</html>
